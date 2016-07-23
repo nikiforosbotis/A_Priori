@@ -2,3 +2,5 @@
 3rd exercise in Python 
 
 This repository includes the implementation of the A_Priori algorithm (https://en.wikipedia.org/wiki/Apriori_algorithm).
+
+https://camo.githubusercontent.com/1c1afd9e0034fb1da21527c9e739b73efd19003d/68747470733a2f2f75706c6f61642e77696b696d656469612e6f72672f6d6174682f342f662f622f34666265646231663837386434663862343964643030356433633064643837332e706e67
