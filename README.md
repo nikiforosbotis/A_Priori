@@ -1,6 +1,6 @@
 # A_Priori
 
-This repository includes the implementation of the A_Priori algorithm in Python (https://en.wikipedia.org/wiki/Apriori_algorithm).
+This repository includes the implementation of the [A_Priori algorithm](https://en.wikipedia.org/wiki/Apriori_algorithm) in Python.
 
 
 # A-Priori Algorithm
