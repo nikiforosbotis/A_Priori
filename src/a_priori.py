@@ -16,14 +16,12 @@ parser.add_argument("-o", "--output", type=str, help="output file")
 
 args = parser.parse_args()
 
-
-def GetAllUniqueItems(name):   #η μέθοδος αυτή κάθε φορά που καλείται επιστρέφει όλα τα μοναδικά στοιχεία του αρχείου.
+#Each time this method is called, it returns all the uniqe file's itmes.
+def GetAllUniqueItems(name):
     with open(name, 'r') as f:
         result = set.union(*({field.strip().lower() for field in row}
                              for row in csv.reader(f, delimiter=',', skipinitialspace=True)))
-
     list_num = []
-
     if(args.numeric == True):
         for i in list(result):
             list_num.append(int(i))
@@ -33,31 +31,29 @@ def GetAllUniqueItems(name):   #η μέθοδος αυτή κάθε φορά π�
 
     return list_num
 
-def GetUniqueItems(basket):   #η μέθοδος αυτή είναι όπως η ζητούμενη στην περιγραφή του αλγορίθμου. Πέρνει ως όρισμα ένα καλάθι και επιστρέφει ένα set που περιέχει τα μοναδικά στοιχεία του καλαθιού.
+def GetUniqueItems(basket):
     unique = set(basket)
     return unique
 
-def GetPairs(s):   #η μέθοδος GetPairs(s) δέχεται ως όρισμα ένα λεξικό και επιστρέφει μια λίστα η οποία περιέχει όλα τα πιθανά ζεύγη.
+#This methods takes a dictionary as an argument and returns a list with all the potential pairs.
+def GetPairs(s):
     pairs = itertools.combinations(s, 2)
     pairs_list = []
     for pair in pairs:
         pairs_list.append(pair)
     return pairs_list
 
-def A_Priori_Algorithm_First_Pass(file, s):   #εδώ γίνεται το πρώτο πέρασμα του αλγορίθμου, όπου το αποτέλεσμα είναι ένα λεξικό με τις συχνότητες των μοναδικών στοιχείων κάθε καλαθιού.
-
+#The algorithm's first passage. It returns a dictionary containing the frequencies of the unique items of each basket.
+def A_Priori_Algorithm_First_Pass(file, s):
     input_file = open(file, 'r')
     csv_reader = csv.reader(input_file, delimiter=',')
-
-    if(args.numeric == True):   #αν το αρχείο input έχει αριθμούς, αυτή η συνθήκη επιτρέπει να τους χειριστεί αναλόγως.
-        
+    #If the file contains numbers, these are manipulated accordingly.
+    if(args.numeric == True):
         baskets_strings = []
         all_items = GetAllUniqueItems(file)
-
         for row in csv_reader:
             unique_row_items = set([field.strip().lower() for field in row])
             baskets_strings.append(unique_row_items)
-
         i = 0
         baskets = []
         while(i < len(baskets_strings)):
@@ -69,18 +65,15 @@ def A_Priori_Algorithm_First_Pass(file, s):   #εδώ γίνεται το πρώ
     else:
         baskets = []
         all_items = GetAllUniqueItems(file)
-
         for row in csv_reader:
             unique_row_items = set([field.strip().lower() for field in row])
             baskets.append(unique_row_items)
-            
+
     input_file.close()
-             
     counts = {}
     freq = {}
     i = 0
-    
-    while(i < len(baskets)):   #για κάθε διαφορετικό καλάθι, ακολουθείται η εξής διαδικασία.
+    while(i < len(baskets)):
         items = GetUniqueItems(baskets[i])
         items_list = list(items)
         k = 0
@@ -91,9 +84,8 @@ def A_Priori_Algorithm_First_Pass(file, s):   #εδώ γίνεται το πρώ
                 counts[(items_list[k], )] = counts[(items_list[k], )] + 1
             k = k + 1
         i = i + 1
-
     i = 0
-    if(args.percentage == True):   #αν ο αριθμός που δίνει ο χρήστης μέσω του support αντιστοιχεί σε ποσοστό (σύμφωνα με την εκφώνηση) τότε το πρόγραμμα μπαίνει σε αυτό το βρόχο.
+    if(args.percentage == True):
         while(i < len(all_items)):
             if(counts[(all_items[i], )] >= ((int(s)/100) * (len(baskets)))):
                 freq[(all_items[i], )] = counts[(all_items[i], )]
@@ -103,24 +95,19 @@ def A_Priori_Algorithm_First_Pass(file, s):   #εδώ γίνεται το πρώ
             if(counts[(all_items[i], )] >= int(s)):
                 freq[(all_items[i], )] = counts[(all_items[i], )]
             i = i + 1
-
     return freq
 
-def A_Priori_Algorithm_Next_Passes(file, freqk, k, s):   #η μέθοδος αυτή είναι ουσιαστικά η κύρια υλοποίηση του αλγορίθμου, που περιέχει τα επόμενα (μετά το 1ο) περάσματα.
-
+#The main algorithm's implementation. It contains the passages >1.
+def A_Priori_Algorithm_Next_Passes(file, freqk, k, s):
     input_file = open(file, 'r')
     csv_reader = csv.reader(input_file, delimiter=',')
 
-    
-    if(args.numeric == True):   #αντίστοιχα με την προηγούμενη μέθοδο, αφορά την περίπτωση που το αρχείο csv περιέχει αριθμούς.
-        
+    if(args.numeric == True):
         baskets_strings = []
         all_items = GetAllUniqueItems(file)
-
         for row in csv_reader:
             unique_row_items = set([field.strip().lower() for field in row])
             baskets_strings.append(unique_row_items)
-
         i = 0
         baskets = []
         while(i < len(baskets_strings)):
@@ -136,21 +123,21 @@ def A_Priori_Algorithm_Next_Passes(file, freqk, k, s):   #η μέθοδος αυ
         for row in csv_reader:
             unique_row_items = set([field.strip().lower() for field in row])
             baskets.append(unique_row_items)
-            
-    input_file.close()
 
+    input_file.close()
     counts = {}
     freq = {}
     i = 0
 
-    while(i < len(baskets)):   #για κάθε διαφορετικό καλάθι βρίσκουμε τα μοναδικά του στοιχεια και κατόπιν τα ζευγάρια και τις συχνότητες αυτών.
+    #For every single basket, we are finding the unique items and then the pairs and their sequencies.
+    while(i < len(baskets)):
         items = GetUniqueItems(baskets[i])
         items_list = list(items)
         itemset_pairs = GetPairs(freqk)
         u = 0
         candidates = []
         q = 0
-        while(q < len(itemset_pairs)):   #για κάθε ξεχωριστο ζευγάρι ακολουθείται η παρακάτω διαδικασια.
+        while(q < len(itemset_pairs)):
             a1 = itemset_pairs[q][0]
             a2 = itemset_pairs[q][1]
             list_1 = []
@@ -161,7 +148,7 @@ def A_Priori_Algorithm_Next_Passes(file, freqk, k, s):   #η μέθοδος αυ
             if(candidate not in candidates):
                 candidates.append(candidate)
                 candidate_list = list(candidate)
-                        
+
                 if(k == 1):
                     candidate_list_completed = []
                     candidate_list_completed.append(candidate_list[0][0])
@@ -173,18 +160,17 @@ def A_Priori_Algorithm_Next_Passes(file, freqk, k, s):   #η μέθοδος αυ
                             counts[tuple(final_list)] = 1
                         else:
                             counts[tuple(final_list)] = counts[tuple(final_list)] + 1
-                            
-                        if(args.percentage == True):   #αν το support που δίνει ο χρήστης αντιστοιχεί σε ποσοστό, τοτε το πρόγραμμα εισάγεται σε αυτό τον βρόγχο.
-                            if(counts[tuple(final_list)] >= ((int(s)/100) * (len(baskets)))):   
+                        #if the support which is given as a percentage from the user, then this code is executed.
+                        if(args.percentage == True):
+                            if(counts[tuple(final_list)] >= ((int(s)/100) * (len(baskets)))):
                                 if(tuple(final_list) in freq):
                                     del freq[tuple(final_list)]
                                 freq[tuple(final_list)] = counts[tuple(final_list)]
                         else:
                             if(counts[tuple(final_list)] >= int(s)):
-                                if(tuple(final_list) in freq):   #αν η λίστα (το tuple της) υπάρχει ήδη στο λεξικό, τότε την διαγράφουμε για να μπεί το νέο (αυξημένο) counts.
+                                if(tuple(final_list) in freq):
                                     del freq[tuple(final_list)]
-                                freq[tuple(final_list)] = counts[tuple(final_list)]         
-            
+                                freq[tuple(final_list)] = counts[tuple(final_list)]
                 elif(k == 2):
                     candidate_list_completed = []
                     candidate_list_completed.append(candidate_list[0][0])
@@ -209,13 +195,12 @@ def A_Priori_Algorithm_Next_Passes(file, freqk, k, s):   #η μέθοδος αυ
                                 if(tuple(final_list) in freq):
                                     del freq[tuple(final_list)]
                                 freq[tuple(final_list)] = counts[tuple(final_list)] - 1
-                                
             q = q + 1
         i = i + 1
 
     return freq
 
-def A_Priori_Algorithm(file, s):   #ο κυρίος αλγόριθμος (ο οποίος καλέι τις προηγούμενες μεθόδους) φαίνεται σε αυτό το σημείο.
+def A_Priori_Algorithm(file, s):
     all_freq = {}
     results = []
     k = 1
@@ -228,11 +213,12 @@ def A_Priori_Algorithm(file, s):   #ο κυρίος αλγόριθμος (ο ο�
         freqk = freq
         k = k + 1
 
-    return all_freq, results   #επιστρέφει τόσο το λεξικό (όπως λέει η εκφώνηση) όσο και την λίστα που περιέχει τα λεξικά ώστε να μας βοηθήσει στην εμφάνιση.
+    return all_freq, results
 
-final_result, results = A_Priori_Algorithm(args.filename, args.support)   
+final_result, results = A_Priori_Algorithm(args.filename, args.support)
 
-if(isinstance(args.output, str) == True):   #αν ο χρήστης θέλει το πρόγραμμά του να αποθηκευτεί σε αρχείο.
+#If the user wants the results to be saved in a file, this code segment is executed.
+if(isinstance(args.output, str) == True):
     output_file = open(args.output, 'w')
     csv_writer = csv.writer(output_file, delimiter = ',')
 
@@ -240,17 +226,11 @@ if(isinstance(args.output, str) == True):   #αν ο χρήστης θέλει �
         csv_writer.writerow(row)
 
     output_file.close()
-    
-csv_writer = csv.writer(sys.stdout, delimiter=';')   #η εμφάνιση των αποτελεσμάτων στην οθόνη.
+
+csv_writer = csv.writer(sys.stdout, delimiter=';')
 
 for freqs in results:
     row = []
     for key in sorted(freqs.keys()):
         row.append("{0}:{1}".format(key, freqs[key]))
     csv_writer.writerow(row)
-
-
-
-
-
-
