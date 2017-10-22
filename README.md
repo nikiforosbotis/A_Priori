@@ -51,7 +51,7 @@ Indicative input and output files of the script:
 ('a',):3;('and',):4;('cat',):5;('dog',):6;('training',):3
 ('and', 'cat'):3;('and', 'dog'):3;('cat', 'dog'):4
 ```
-* [example_2.csv](examples.csv/example_2.csv), support:2 (considering the item sets as arithmetic), will produce:
+* [example_2.csv](examples.csv/example_2.csv), support: 2 (considering the item sets as arithmetic), will produce:
 ```
 (1,):2;(2,):3;(3,):3;(5,):3
 (1, 3):2;(2, 3):2;(2, 5):3;(3, 5):2
